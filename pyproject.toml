@@ -9,7 +9,7 @@ description = "JobScout — autonomous job-search agent for OpenClaw (LinkedIn, 
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Ivan Šoštarko", email = "" }]
+authors = [{ name = "Ivan Šoštarko", email = "ivan@example.com" }]
 dependencies = [
     "requests>=2.31",
     "beautifulsoup4>=4.12",
