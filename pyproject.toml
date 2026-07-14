@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jobscout"
+version = "1.0.0"
+description = "JobScout — autonomous job-search agent for OpenClaw (LinkedIn, MojPosao, Posao.hr, HZZ Burza, Facebook groups)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Ivan Šoštarko", email = "" }]
+dependencies = [
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+    "openpyxl>=3.1",
+    "PyYAML>=6.0",
+]
+
+[project.scripts]
+jobscout = "jobscout.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

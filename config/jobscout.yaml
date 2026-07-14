@@ -1,0 +1,161 @@
+# =============================================================================
+# JobScout — central configuration
+# This is the ONLY file you need to edit to customize the agent.
+# Secrets (tokens, passwords) go in .env — never here.
+# =============================================================================
+
+general:
+  timezone: "Europe/Zagreb"
+  language: "en"                 # report language: en | hr
+  data_dir: "./data"
+  excel_file: "jobs.xlsx"        # stored inside data_dir
+  log_level: "INFO"
+
+# -----------------------------------------------------------------------------
+# What jobs to look for (used by every source)
+# -----------------------------------------------------------------------------
+search:
+  keywords:
+    - "CTO"
+    - "Chief Technology Officer"
+    - "COO"
+    - "Chief Operating Officer"
+    - "Business Manager"
+    - "Project Manager"
+    - "IT Manager"
+    - "Program Manager"
+    - "AI Engineer"
+    - "Head of Engineering"
+    - "VP Engineering"
+    - "Operations Manager"
+    - "Technical Director"
+  # Croatian variants (used on HR job boards)
+  keywords_hr:
+    - "voditelj projekta"
+    - "voditelj IT"
+    - "direktor"
+    - "tehnički direktor"
+    - "operativni direktor"
+    - "voditelj programa"
+    - "poslovni menadžer"
+  # Jobs whose title contains any of these are dropped
+  exclude_keywords:
+    - "intern"
+    - "student"
+    - "junior"
+  workplace_types: ["onsite", "remote", "hybrid"]   # all accepted
+
+# -----------------------------------------------------------------------------
+# Sources — enable/disable each independently
+# -----------------------------------------------------------------------------
+sources:
+  linkedin:
+    enabled: true
+    locations:
+      - name: "Zagreb, Croatia"
+        geo: "Zagreb, Croatia"
+      - name: "Bjelovar, Croatia"
+        geo: "Bjelovar, Croatia"
+      - name: "Croatia"
+        geo: "Croatia"
+      - name: "Riyadh, Saudi Arabia"
+        geo: "Riyadh, Saudi Arabia"
+    # f_WT: 1=onsite, 2=remote, 3=hybrid (empty = all)
+    workplace_filters: []
+    max_results_per_query: 25
+    posted_within_hours: 24
+
+  mojposao:
+    enabled: true
+    base_url: "https://www.mojposao.hr"
+    categories: ["IT, telekomunikacije", "Management"]
+    locations: ["Zagreb", "Bjelovar", "Cijela Hrvatska"]
+
+  posao_hr:
+    enabled: true
+    base_url: "https://www.posao.hr"
+    categories: ["Informatika, programiranje i telekomunikacije", "Management"]
+    locations: ["Zagreb", "Bjelovar", "Cijela Hrvatska"]
+
+  burza_hzz:
+    enabled: true
+    base_url: "https://burzarada.hzz.hr"
+    categories: ["Informatički, računalni i stručnjaci za Internet"]
+    locations: ["Zagreb", "Bjelovar"]
+
+  facebook_groups:
+    # NOTE: Facebook has no public API for group feeds. This source needs a
+    # logged-in session cookie (see docs/SOURCES.md) and may violate FB ToS.
+    # It is DISABLED by default — enable at your own risk.
+    enabled: false
+    groups:
+      - "https://www.facebook.com/groups/1470658223200432/"
+      - "https://www.facebook.com/groups/2158108910905022/"
+    max_posts_per_group: 30
+
+# -----------------------------------------------------------------------------
+# Scoring — how JobScout ranks jobs for the "what should I apply to" suggestion
+# -----------------------------------------------------------------------------
+scoring:
+  title_weights:
+    "cto": 10
+    "chief technology": 10
+    "coo": 10
+    "chief operating": 10
+    "vp": 8
+    "director": 8
+    "head of": 8
+    "program manager": 7
+    "it manager": 7
+    "project manager": 6
+    "ai engineer": 6
+    "business manager": 6
+  seniority_bonus: 3            # bonus for senior/lead/executive in title
+  remote_bonus: 2
+  location_bonus:               # extra points per location substring match
+    "zagreb": 2
+    "riyadh": 2
+    "remote": 2
+  min_score_to_recommend: 6
+  top_n_recommendations: 5
+
+# -----------------------------------------------------------------------------
+# AI (Ollama) — used to write the human "apply to these" suggestion text
+# -----------------------------------------------------------------------------
+ai:
+  enabled: true
+  provider: "ollama"
+  base_url: "http://localhost:11434"
+  model: "qwen2.5:14b"          # any Ollama model tag works (e.g. qwen2.5:7b, llama3.1)
+  temperature: 0.3
+  max_jobs_in_prompt: 40
+  profile: >
+    Senior technology executive (COO/CTO/SVP level) with background in
+    technology operations, digital transformation, SaaS leadership and
+    defence/dual-use tech. Interested in executive and senior management
+    roles in Croatia (Zagreb, Bjelovar, remote) and Riyadh, Saudi Arabia.
+
+# -----------------------------------------------------------------------------
+# Notifications
+# -----------------------------------------------------------------------------
+notifications:
+  telegram:
+    enabled: true
+    # bot token + chat id come from .env (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
+    parse_mode: "HTML"
+  email:
+    enabled: true
+    # SMTP settings come from .env (SMTP_HOST, SMTP_PORT, SMTP_USER,
+    # SMTP_PASSWORD, EMAIL_FROM, EMAIL_TO)
+    subject_daily: "JobScout — daily jobs report"
+    subject_weekly: "JobScout — weekly jobs report"
+
+# -----------------------------------------------------------------------------
+# Schedule (informational — actual registration is done by scripts/setup_cron.sh
+# either as OpenClaw cron jobs or plain crontab entries)
+# -----------------------------------------------------------------------------
+schedule:
+  scan_cron: "0 7-17 * * *"        # every hour 07:00–17:00
+  telegram_report_cron: "0 19 * * *"
+  email_report_cron: "0 21 * * *"  # "every night at 9" = 21:00
+  weekly_report_cron: "0 9 * * 5"  # Friday 09:00

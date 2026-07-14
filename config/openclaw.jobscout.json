@@ -1,0 +1,46 @@
+{
+  "$comment": "JobScout agent snippet for ~/.openclaw/openclaw.json — merge these keys into your existing config. Uses local Ollama with Qwen as the default model.",
+
+  "models": {
+    "providers": {
+      "ollama": {
+        "api": "ollama",
+        "baseUrl": "http://localhost:11434",
+        "models": [
+          { "id": "qwen2.5:14b", "name": "Qwen 2.5 14B" },
+          { "id": "qwen2.5:7b",  "name": "Qwen 2.5 7B" }
+        ]
+      }
+    }
+  },
+
+  "agents": {
+    "defaults": {
+      "model": "ollama/qwen2.5:14b",
+      "workspace": "~/jobscout/workspace"
+    },
+    "list": [
+      {
+        "id": "jobscout",
+        "name": "JobScout",
+        "model": "ollama/qwen2.5:14b",
+        "workspace": "~/jobscout/workspace",
+        "description": "Autonomous job-search agent (LinkedIn, MojPosao, Posao.hr, HZZ, FB groups)"
+      }
+    ]
+  },
+
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "allowedUsers": ["${TELEGRAM_CHAT_ID}"]
+    }
+  },
+
+  "tools": {
+    "exec": { "enabled": true },
+    "cron": { "enabled": true },
+    "message": { "enabled": true }
+  }
+}
